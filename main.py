@@ -6,7 +6,7 @@ import requests
 import json
 import math
 
-def enviar_email(body):
+def enviar_email(body, receiver):
 	corpo_email =\
 	f"""
 	{body}
@@ -15,7 +15,7 @@ def enviar_email(body):
 	msg = email.message.Message()
 	msg['Subject'] = "{EUR} "+f"R${math.ceil(body['result'] * 100.0) / 100.0} | " +('000'+str(date.today().day))[-2:]+'/'+('000'+str(date.today().month))[-2:]+'/'+str(date.today().year)
 	msg['From'] = os.environ['SENDER']
-	msg['To'] = json.loads(os.environ['RECEIVERS'])
+	msg['To'] = receiver
 	password = os.environ['GMAILKEY']
 	msg.add_header ('Content-Type', 'text/html') 
 	msg.set_payload(corpo_email)
@@ -23,10 +23,9 @@ def enviar_email(body):
 	s = smtplib.SMTP('smtp.gmail.com: 587')
 	s.starttls()
 
-	# Login Credentials for sending the mail
+	# Login Credentials for sending the mails
 	s.login(msg['From'], password)
-	for receiver in msg['To']:
-		s.sendmail(msg['From'], receiver, msg.as_string().encode ('utf-8'))
+	s.sendmail(msg['From'], msg['To'], msg.as_string().encode ('utf-8'))
 	print('Emails enviados')
 
 def preco_euro(fromc, toc, amount):
@@ -46,4 +45,7 @@ def preco_euro(fromc, toc, amount):
 
 if __name__ == '__main__':
 	preco = json.loads(preco_euro('EUR', 'BRL', '1')[0])
-	enviar_email(preco)
+
+	receivers = json.loads(os.environ['RECEIVERS'])
+	for receiver in receivers:
+		enviar_email(preco, receiver)
