@@ -2,8 +2,6 @@
 name: Check Currency
 
 on:
-  push:
-    branches: [ "main" ]
   schedule:
     - cron: '0 10 * * 1-5'
 
@@ -32,5 +30,8 @@ jobs:
         GMAILKEY: ${{secrets.GMAILKEY}}
         RECEIVERS: ${{secrets.RECEIVERS}}
         SENDER: ${{secrets.SENDER}}
-      run: |
-        python main.py
+      uses: nick-fields/retry@v2 
+      with:
+        timeout_minutes: 5
+        max_attempts: 5 
+        command: python main.py
