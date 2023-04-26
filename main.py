@@ -30,7 +30,8 @@ if __name__ == '__main__':
 	for currency in from_currency:
 		execute(currency, to_currency)
 
-	receivers = json.loads(os.environ['RECEIVERS'])
-	email = Email(objects)
-	for receiver in receivers:
-		email.send(receiver)
+	if objects.__len__() > 0:
+		receivers = json.loads(os.environ['RECEIVERS'])
+		email = Email(objects)
+		for receiver in receivers:
+			email.send(receiver)
